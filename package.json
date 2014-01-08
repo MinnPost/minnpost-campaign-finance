@@ -13,6 +13,7 @@
     "email": "data@minnpost.com"
   },
   "dependencies": {
+    "grunt-gss-pull": "~0.1.2"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

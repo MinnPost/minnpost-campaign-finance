@@ -6,15 +6,11 @@ A dashboard look at campaign finance for Minnesota elections.
 
 ## Data
 
-*Describe the data sources here.  Use links and URLs to show where the data came from.  Put small sized originals or modified data sources in the ```data``` folder*
-
-*For larger data sources that may need to be processed, provide instructions on how to download.  For instance:  ```cd data && wget blah.txt```.  Also, make sure to put an entry in the ```.gitignore```.*
+Data manually collected from reports and managed in a [Google Spreadsheet](https://docs.google.com/a/minnpost.com/spreadsheet/ccc?key=0AjYft7IGrHzNdFRmbUtZZTNKOWVHT0FKb1BrQTdqUlE#gid=0).
 
 ## Data processing
 
-The following describes how the data was processed and is not necessarily needed to run or install the application, but more included for reference, transparency, and development.
-
-*Describe data processing here, include commands.  Put data processing scripts or configurations in the ```data-processing``` folder.*
+The data is used as JSON within the application and can be updated locally with the `grunt data` command.
 
 ## Development and running locally
 
