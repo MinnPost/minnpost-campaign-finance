@@ -73,11 +73,23 @@ body .node-unpublished {
     }
   }
 
-  
+  table {
+    width: 100%;
+    margin-bottom: 2em;
 
-  
+    tbody {
 
-  
+      tr {
+
+        td:first-child {
+          width: 50%;
+        }
+        td:nth-child(2) {
+          width: 20%;
+        }
+      }
+    }
+  }
 
   // Breakpoints
   @media screen and (max-width: 768px) {
