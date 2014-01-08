@@ -65,35 +65,35 @@ Deploying will push the relevant files up to Amazon's AWS S3 so that they can be
 
 ## About Us
 
-MinnData is Alan, Tom, and Kaeti and all the awesome contributors to open source projects we utilize.  See our work at [minnpost.com/data](http://minnpost.com/data).
+MinnData, the MinnPost data team, is Alan, Tom, and Kaeti and all the awesome contributors to open source projects we utilize.  See our work at [minnpost.com/data](http://minnpost.com/data).
 
 ```
 
-                                               .--.
-                                               `.  \
-                                                 \  \
-                                                  .  \
-                                                  :   .
-                                                  |    .
-                                                  |    :
-                                                  |    |
-  ..._  ___                                       |    |
- `."".`''''""--..___                              |    |
- ,-\  \             ""-...__         _____________/    |
- / ` " '                    `""""""""                  .
- \                                                      L
- (>                                                      \
-/                                                         \
-\_    ___..---.                                            L
-  `--'         '.                                           \
-                 .                                           \_
-                _/`.                                           `.._
-             .'     -.                                             `.
-            /     __.-Y     /''''''-...___,...--------.._            |
-           /   _."    |    /                ' .      \   '---..._    |
-          /   /      /    /                _,. '    ,/           |   |
-          \_,'     _.'   /              /''     _,-'            _|   |
-                  '     /               `-----''               /     |
-                  `...-'                                       `...-'
+                                                   .--.
+                                                   `.  \
+                                                     \  \
+                                                      .  \
+                                                      :   .
+                                                      |    .
+                                                      |    :
+                                                      |    |
+      ..._  ___                                       |    |
+     `."".`''''""--..___                              |    |
+     ,-\  \             ""-...__         _____________/    |
+     / ` " '                    `""""""""                  .
+     \                                                      L
+     (>                                                      \
+    /                                                         \
+    \_    ___..---.                                            L
+      `--'         '.                                           \
+                     .                                           \_
+                    _/`.                                           `.._
+                 .'     -.                                             `.
+                /     __.-Y     /''''''-...___,...--------.._            |
+               /   _."    |    /                ' .      \   '---..._    |
+              /   /      /    /                _,. '    ,/           |   |
+              \_,'     _.'   /              /''     _,-'            _|   |
+                      '     /               `-----''               /     |
+                      `...-'                                       `...-'
 
 ```
