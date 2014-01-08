@@ -1,0 +1,29 @@
+{
+  "name": "minnpost-campaign-finance",
+  "version": "0.0.0",
+  "main": "index.html",
+  "homepage": "https://github.com/minnpost/minnpost-campaign-finance",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/minnpost/minnpost-campaign-finance"
+  },
+  "bugs": "https://github.com/minnpost/minnpost-campaign-finance/issues",
+  "license": "MIT",
+  "author": {
+    "name": "MinnPost",
+    "email": "data@minnpost.com"
+  },
+  "dependencies": {
+    "jquery": "~1.9",
+    "underscore": "~1.5.2",
+    "backbone": "~1.1.0",
+    "ractive": "~0.3.7",
+    "ractive-backbone": "~0.1.0",
+    "ractive-events-tap": "~0.1.0",
+    "unsemantic": "*",
+    "moment": "~2.4.0",
+    "requirejs": "~2.1.9",
+    "text": "~2.0.10"
+  }
+}
+
