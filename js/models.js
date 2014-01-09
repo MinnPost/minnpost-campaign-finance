@@ -20,6 +20,13 @@ define('models', ['underscore', 'Backbone', 'helpers'],
       // Call this in other models
       //models.NEWModel.__super__.initialize.apply(this, arguments);
     }
+  });
+
+  // Candidate
+  models.Candidate = models.Base.extend({
+    initialize: function() {
+      models.Candidate.__super__.initialize.apply(this, arguments);
+    }
 
   });
 

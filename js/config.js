@@ -19,7 +19,6 @@ require.config({
   },
   baseUrl: 'js',
   paths: {
-    
     'requirejs': '../bower_components/requirejs/require',
     'text': '../bower_components/text/text',
     'jquery': '../bower_components/jquery/jquery.min',
@@ -29,6 +28,7 @@ require.config({
     'Ractive-Backbone': '../bower_components/ractive-backbone/Ractive-Backbone.min',
     'Ractive-events-tap': '../bower_components/ractive-events-tap/Ractive-events-tap.min',
     'moment': '../bower_components/moment/min/moment.min',
+    'highcharts': '../bower_components/highcharts/highcharts',
     'minnpost-campaign-finance': 'app'
   }
 });

@@ -52,6 +52,13 @@ define('helpers', ['jquery', 'underscore', 'Backbone'],
     },
 
     /**
+     * Creates identifier for things like CSS classes.
+     */
+    identifier: function(str) {
+      return str.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-').replace(/[^\w-]+/g,'');
+    },
+
+    /**
      * Returns version of MSIE.
      */
     isMSIE: function() {
@@ -59,7 +66,7 @@ define('helpers', ['jquery', 'underscore', 'Backbone'],
       return match ? parseInt(match[2], 10) : false;
     },
 
-    
+
     /**
      * Override Backbone's ajax call to use JSONP by default as well
      * as force a specific callback to ensure that server side
@@ -75,7 +82,7 @@ define('helpers', ['jquery', 'underscore', 'Backbone'],
       }
       return Backbone.$.ajax.apply(Backbone.$, options);
     },
-    
+
 
     /**
      * Wrapper for a JSONP request

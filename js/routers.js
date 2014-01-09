@@ -5,10 +5,11 @@ define('routers', [
   'underscore', 'Backbone', 'Ractive', 'Ractive-Backbone',
   'helpers', 'models', 'collections', 'views',
   'text!templates/application.mustache',
+  'text!templates/contests.mustache',
   'text!templates/loading.mustache'
 ], function(_, Backbone, Ractive, RactiveBackbone,
     helpers, models, collections, views,
-    tApplication, tLoading) {
+    tApplication, tContests, tLoading) {
   var routers = {};
 
   // Base model
@@ -32,23 +33,41 @@ define('routers', [
         },
         adaptors: [ 'Backbone' ]
       });
+
+      // Get content element
+      this.$contentEl = this.app.$el.find('.content-container');
     },
 
     routes: {
-      'routeOne': 'routeOne',
+      'contests': 'routeContests',
       '*default': 'routeDefault'
     },
 
+    // Start router
     start: function() {
       Backbone.history.start();
     },
 
+    // Default route
     routeDefault: function() {
-      this.navigate('/routeOne', { trigger: true, replace: true });
+      this.navigate('/contests', { trigger: true, replace: true });
     },
 
-    routeRouteOne: function() {
-      // this is just a placeholder for a route
+    // Overview of all contests
+    routeContests: function() {
+      this.views.contests = new views.Contests({
+        el: this.$contentEl,
+        template: tContests,
+        data: {
+          contests: this.app.contests,
+          formatters: helpers
+        },
+        router: this,
+        partials: {
+          loading: tLoading
+        },
+        adaptors: [ 'Backbone' ]
+      });
     }
   });
 

@@ -20,7 +20,13 @@ define('collections', ['underscore', 'Backbone', 'helpers', 'models'],
       // Call this in other collections
       //collection.NEWCollection.__super__.initialize.apply(this, arguments);
     }
+  });
 
+  // Candidates
+  collections.Candidates = collections.Base.extend({
+    initialize: function() {
+      collections.Candidates.__super__.initialize.apply(this, arguments);
+    }
   });
 
   // Return what we have

@@ -23,7 +23,7 @@
     "unsemantic": "*",
     "moment": "~2.4.0",
     "requirejs": "~2.1.9",
-    "text": "~2.0.10"
+    "text": "~2.0.10",
+    "highcharts": "~3.0.7"
   }
 }
-

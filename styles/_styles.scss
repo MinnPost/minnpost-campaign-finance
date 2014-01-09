@@ -91,6 +91,19 @@ body .node-unpublished {
     }
   }
 
+  .contests {
+
+    .contest {
+      margin-bottom: 3em;
+
+      .contest-chart {
+        width: 100%;
+        height: 12em;
+        margin-bottom: 1em;
+      }
+    }
+  }
+
   // Breakpoints
   @media screen and (max-width: 768px) {
   }

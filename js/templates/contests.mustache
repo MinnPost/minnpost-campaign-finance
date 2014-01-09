@@ -1,0 +1,35 @@
+<div class="contests">
+
+  {{#contests}}
+    {{>contest}}
+  {{/contests}}
+
+</div>
+
+
+<!-- {{>contest}} -->
+<div class="contest {{ id }}">
+  <h4>{{ name }}</h4>
+
+  <div class="contest-chart chart-{{ id }}"></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Candidate</th><th>Amount raised</th><th>Cash on hand</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{#candidates}}
+        <tr>
+          <td>{{ candidate }}</td>
+          <td>{{ formatters.formatCurrency(amountraised) }}</td>
+          <td>{{ formatters.formatCurrency(cashonhand) }}</td>
+        </tr>
+      {{/candidates}}
+    </tbody>
+  </table>
+
+</div>
+<!-- {{/contest}} -->
