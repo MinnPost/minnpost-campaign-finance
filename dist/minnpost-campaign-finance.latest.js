@@ -53,6 +53,13 @@ define('helpers', ['jquery', 'underscore', 'Backbone'],
     },
 
     /**
+     * Creates identifier for things like CSS classes.
+     */
+    identifier: function(str) {
+      return str.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-').replace(/[^\w-]+/g,'');
+    },
+
+    /**
      * Returns version of MSIE.
      */
     isMSIE: function() {
@@ -60,7 +67,7 @@ define('helpers', ['jquery', 'underscore', 'Backbone'],
       return match ? parseInt(match[2], 10) : false;
     },
 
-    
+
     /**
      * Override Backbone's ajax call to use JSONP by default as well
      * as force a specific callback to ensure that server side
@@ -76,7 +83,7 @@ define('helpers', ['jquery', 'underscore', 'Backbone'],
       }
       return Backbone.$.ajax.apply(Backbone.$, options);
     },
-    
+
 
     /**
      * Wrapper for a JSONP request
@@ -179,6 +186,13 @@ define('models', ['underscore', 'Backbone', 'helpers'],
       // Call this in other models
       //models.NEWModel.__super__.initialize.apply(this, arguments);
     }
+  });
+
+  // Candidate
+  models.Candidate = models.Base.extend({
+    initialize: function() {
+      models.Candidate.__super__.initialize.apply(this, arguments);
+    }
 
   });
 
@@ -208,7 +222,13 @@ define('collections', ['underscore', 'Backbone', 'helpers', 'models'],
       // Call this in other collections
       //collection.NEWCollection.__super__.initialize.apply(this, arguments);
     }
+  });
 
+  // Candidates
+  collections.Candidates = collections.Base.extend({
+    initialize: function() {
+      collections.Candidates.__super__.initialize.apply(this, arguments);
+    }
   });
 
   // Return what we have
@@ -222,9 +242,10 @@ define('collections', ['underscore', 'Backbone', 'helpers', 'models'],
  * Ractive classes can be extended but we still need a number of
  * things at instantian, like templates
  */
-define('views', ['underscore', 'Ractive', 'helpers'],
-  function(_, Ractive, helpers) {
+define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
+  function(_, $, Ractive, Highcharts, helpers) {
   var views = {};
+  var defaultChartOptions;
 
   // Base view to extend from
   views.Base = Ractive.extend({
@@ -240,11 +261,131 @@ define('views', ['underscore', 'Ractive', 'helpers'],
     }
   });
 
+  // View for contests
+  views.Contests = views.Base.extend({
+    init: function() {
+      this.baseInit.apply(this, arguments);
+
+      // Look for contests to then make charts
+      this.observe('contests', function(n, o) {
+        var thisView = this;
+        var options;
+
+        if (!_.isUndefined(n)) {
+          _.each(n, function(contest, ci) {
+            // Make chart options and add data
+            options = _.clone(defaultChartOptions);
+            options = $.extend(true, options, {
+              xAxis: {
+                categories: contest.candidates.pluck('candidate')
+              },
+              series: [{
+                name: 'Cash on hand',
+                data: contest.candidates.pluck('cashonhand')
+              },
+              {
+                name: 'Amount raised',
+                data: contest.candidates.pluck('amountraised')
+              }],
+              tooltip: {
+                formatter: function() {
+                  return this.key + ' <br /> ' + this.series.name + ': <strong>' + helpers.formatCurrency(this.y) + '</strong>';
+                }
+              }
+            });
+
+            $(this.el).find('.chart-' + contest.id).highcharts(options);
+          }, this);
+        }
+      });
+    }
+  });
+
+  // Default chart options
+  defaultChartOptions = {
+    chart: {
+      type: 'bar',
+      style: {
+        fontFamily: '"HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif',
+        color: '#BCBCBC'
+      }
+    },
+    colors: ['#1D71A5', '#1DA595', '#1DA551'],
+    credits: {
+      enabled: false
+    },
+    title: {
+      enabled: false,
+      text: ''
+    },
+    legend: {
+      borderWidth: 0
+    },
+    plotOptions: {
+      line: {
+        lineWidth: 4,
+        states: {
+          hover: {
+            lineWidth: 5
+          }
+        },
+        marker: {
+          fillColor: '#ffffff',
+          lineWidth: 2,
+          lineColor: null,
+          symbol: 'circle',
+          enabled: false,
+          states: {
+            hover: {
+              enabled: true
+            }
+          }
+        }
+      }
+    },
+    xAxis: {
+      title: { },
+      minPadding: 0,
+      maxPadding: 0,
+      type: 'category',
+      labels: {
+        formatter: function() {
+          return this.value;
+        }
+      }
+    },
+    yAxis: {
+      title: {
+        enabled: false,
+        text: '[Update me]',
+        margin: 40,
+        style: {
+          color: 'inherit',
+          fontWeight: 'normal'
+        }
+      },
+      min: 0,
+      gridLineColor: '#BCBCBC'
+    },
+    tooltip: {
+      //shadow: false,
+      //borderRadius: 0,
+      //borderWidth: 0,
+      style: {},
+      useHTML: true,
+      formatter: function() {
+        return this.key + ': <strong>' + this.y + '</strong>';
+      }
+    }
+  };
+
   // Return what we have
   return views;
 });
 
-define('text!templates/application.mustache',[],function () { return '<div class="message-container"></div>\n\n<div class="content-container">\n\n  <h4>Governor</h4>\n  <table>\n    <thead>\n      <tr>\n        <th>Candidate</th><th>Party</th><th>Amount Raised</th>\n      </tr>\n    </thead>\n\n    <tbody>\n      <tr>\n        <td>Dayton (incumbent)</td><td>D</td><td>$1,000,000,000,000</td>\n      </tr>\n    </tbody>\n  </table>\n\n\n  <h4>Congressional District 1</h4>\n  <table>\n    <thead>\n      <tr>\n        <th>Candidate</th><th>Party</th><th>Amount Raised</th>\n      </tr>\n    </thead>\n\n    <tbody>\n      <tr>\n        <td>Candidate X</td><td>D</td><td>$1,000,000</td>\n      </tr>\n    </tbody>\n  </table>\n\n\n  <h4>Congressional District 2</h4>\n  <table>\n    <thead>\n      <tr>\n        <th>Candidate</th><th>Party</th><th>Amount Raised</th>\n      </tr>\n    </thead>\n\n    <tbody>\n      <tr>\n        <td>Candidate X</td><td>D</td><td>$1,000,000</td>\n      </tr>\n    </tbody>\n  </table>\n\n</div>\n\n<div class="footnote-container">\n  <div class="footnote">\n    <p>Some code, techniques, and data on <a href="https://github.com/zzolo/minnpost-campaign-finance" target="_blank">Github</a>.</p>\n  </div>\n</div>\n';});
+define('text!templates/application.mustache',[],function () { return '<div class="message-container"></div>\n\n<div class="content-container">\n\n\n</div>\n\n<div class="footnote-container">\n  <div class="footnote">\n    <p>Some code, techniques, and data on <a href="https://github.com/zzolo/minnpost-campaign-finance" target="_blank">Github</a>.</p>\n  </div>\n</div>\n';});
+
+define('text!templates/contests.mustache',[],function () { return '<div class="contests">\n\n  {{#contests}}\n    {{>contest}}\n  {{/contests}}\n\n</div>\n\n\n<!-- {{>contest}} -->\n<div class="contest {{ id }}">\n  <h4>{{ name }}</h4>\n\n  <div class="contest-chart chart-{{ id }}"></div>\n\n  <table>\n    <thead>\n      <tr>\n        <th>Candidate</th><th>Amount raised</th><th>Cash on hand</th>\n      </tr>\n    </thead>\n\n    <tbody>\n      {{#candidates}}\n        <tr>\n          <td>{{ candidate }}</td>\n          <td>{{ formatters.formatCurrency(amountraised) }}</td>\n          <td>{{ formatters.formatCurrency(cashonhand) }}</td>\n        </tr>\n      {{/candidates}}\n    </tbody>\n  </table>\n\n</div>\n<!-- {{/contest}} -->\n';});
 
 define('text!templates/loading.mustache',[],function () { return '<div class="loading-container">\n  <div class="loading"><span>Loading...</span></div>\n</div>';});
 
@@ -255,10 +396,11 @@ define('routers', [
   'underscore', 'Backbone', 'Ractive', 'Ractive-Backbone',
   'helpers', 'models', 'collections', 'views',
   'text!templates/application.mustache',
+  'text!templates/contests.mustache',
   'text!templates/loading.mustache'
 ], function(_, Backbone, Ractive, RactiveBackbone,
     helpers, models, collections, views,
-    tApplication, tLoading) {
+    tApplication, tContests, tLoading) {
   var routers = {};
 
   // Base model
@@ -282,23 +424,41 @@ define('routers', [
         },
         adaptors: [ 'Backbone' ]
       });
+
+      // Get content element
+      this.$contentEl = this.app.$el.find('.content-container');
     },
 
     routes: {
-      'routeOne': 'routeOne',
+      'contests': 'routeContests',
       '*default': 'routeDefault'
     },
 
+    // Start router
     start: function() {
       Backbone.history.start();
     },
 
+    // Default route
     routeDefault: function() {
-      this.navigate('/routeOne', { trigger: true, replace: true });
+      this.navigate('/contests', { trigger: true, replace: true });
     },
 
-    routeRouteOne: function() {
-      // this is just a placeholder for a route
+    // Overview of all contests
+    routeContests: function() {
+      this.views.contests = new views.Contests({
+        el: this.$contentEl,
+        template: tContests,
+        data: {
+          contests: this.app.contests,
+          formatters: helpers
+        },
+        router: this,
+        partials: {
+          loading: tLoading
+        },
+        adaptors: [ 'Backbone' ]
+      });
     }
   });
 
@@ -306,14 +466,19 @@ define('routers', [
   return routers;
 });
 
+define('text!../data/campaign_finance_spreadsheet.json',[],function () { return '{"2014 Campaign Finances":[{"contest":"Governor","candidate":"Mark Dayton","incumbent":"Y","party":"DFL","amountraised":100000,"cashonhand":9999.38,"from":"","to":"","rowNumber":1},{"contest":"Governor","candidate":"Scott Honour","incumbent":"","party":"R","amountraised":999,"cashonhand":9,"from":"","to":"","rowNumber":2},{"contest":"Governor","candidate":"Kurt Zellers","incumbent":"","party":"R","amountraised":999,"cashonhand":9,"from":"","to":"","rowNumber":3},{"contest":"Senator","candidate":"Al Franken","incumbent":"Y","party":"D","amountraised":8576321.4,"cashonhand":3893286.11,"from":"7/1/2013","to":"9/30/2013","rowNumber":4},{"contest":"Senator","candidate":"Mike McFadden","incumbent":"","party":"R","amountraised":1468620.99,"cashonhand":1252087.2,"from":"7/1/2013","to":"9/30/2013","rowNumber":5},{"contest":"Senator","candidate":"Julianne Ortman","incumbent":"","party":"R","amountraised":119466,"cashonhand":88121.1,"from":"7/1/2013","to":"9/30/2013","rowNumber":6},{"contest":"Senator","candidate":"Jim Abeler","incumbent":"","party":"R","amountraised":54754,"cashonhand":34568.7,"from":"7/1/2013","to":"9/30/2013","rowNumber":7},{"contest":"Senator","candidate":"Chris Dahlberg","incumbent":"","party":"R","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":8}]}';});
+
 /**
  * Main application file for: minnpost-campaign-finance
  *
  * This pulls in all the parts
  * and creates the main object for the application.
  */
-define('minnpost-campaign-finance', ['underscore', 'helpers', 'routers'],
-  function(_, helpers, routers) {
+define('minnpost-campaign-finance', [
+  'underscore', 'helpers', 'routers', 'collections',
+  'text!../data/campaign_finance_spreadsheet.json'
+],
+  function(_, helpers, routers, collections, dCFS) {
 
   // Constructor for app
   var App = function(options) {
@@ -329,6 +494,9 @@ define('minnpost-campaign-finance', ['underscore', 'helpers', 'routers'],
 
   // Start function
   App.prototype.start = function() {
+    // Get data and process into models
+    this.loadData();
+
     // Create router
     this.router = new routers.Router({
       app: this
@@ -336,6 +504,26 @@ define('minnpost-campaign-finance', ['underscore', 'helpers', 'routers'],
 
     // Start backbone history
     this.router.start();
+  };
+
+  // Load up the data
+  App.prototype.loadData = function() {
+    var data = JSON.parse(dCFS);
+    var sheet = '2014 Campaign Finances';
+    data = data[sheet];
+    data = _.groupBy(data, 'contest');
+
+    // Make collections of candidates for each contest
+    this.contests = [];
+    _.each(data, function(candidates, ci) {
+      var contest = {};
+      contest.name = ci;
+      contest.id = this.identifier(ci);
+      contest.candidates = new collections.Candidates(candidates, {
+        app: this
+      });
+      this.contests.push(contest);
+    }, this);
   };
 
   return App;
