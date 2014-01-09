@@ -5,8 +5,8 @@
  * Ractive classes can be extended but we still need a number of
  * things at instantian, like templates
  */
-define('views', ['underscore', 'Ractive', 'highcharts', 'helpers'],
-  function(_, Ractive, Highcharts, helpers) {
+define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
+  function(_, $, Ractive, Highcharts, helpers) {
   var views = {};
   var defaultChartOptions;
 
@@ -56,6 +56,7 @@ define('views', ['underscore', 'Ractive', 'highcharts', 'helpers'],
                 }
               }
             });
+
             $(this.el).find('.chart-' + contest.id).highcharts(options);
           }, this);
         }

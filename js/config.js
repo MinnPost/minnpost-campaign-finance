@@ -11,6 +11,10 @@ require.config({
       deps: ['underscore', 'jquery'],
       exports: 'Backbone'
     },
+    'Highcharts': {
+      exports: 'Highcharts',
+      'deps': [ 'jquery']
+    },
     // Mapbox and requireJS don't really work, so we just let
     // the L be global
     'mapbox': {
@@ -28,7 +32,7 @@ require.config({
     'Ractive-Backbone': '../bower_components/ractive-backbone/Ractive-Backbone.min',
     'Ractive-events-tap': '../bower_components/ractive-events-tap/Ractive-events-tap.min',
     'moment': '../bower_components/moment/min/moment.min',
-    'highcharts': '../bower_components/highcharts/highcharts',
+    'Highcharts': '../bower_components/highcharts/highcharts',
     'minnpost-campaign-finance': 'app'
   }
 });
