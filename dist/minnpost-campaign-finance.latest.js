@@ -190,10 +190,9 @@ define('models', ['underscore', 'Backbone', 'helpers'],
 
   // Candidate
   models.Candidate = models.Base.extend({
-    initialize: function() {
+    initialize: function(data, options) {
       models.Candidate.__super__.initialize.apply(this, arguments);
     }
-
   });
 
   // Return what we have
@@ -228,6 +227,10 @@ define('collections', ['underscore', 'Backbone', 'helpers', 'models'],
   collections.Candidates = collections.Base.extend({
     initialize: function() {
       collections.Candidates.__super__.initialize.apply(this, arguments);
+    },
+
+    comparator: function(model) {
+      return model.get('amountraised') * -1;
     }
   });
 
@@ -289,7 +292,7 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
               }],
               tooltip: {
                 formatter: function() {
-                  return this.key + ' <br /> ' + this.series.name + ': <strong>' + helpers.formatCurrency(this.y) + '</strong>';
+                  return '<strong>' + this.key + '</strong> <br /> <br /> ' + this.series.name + ': <strong>' + helpers.formatCurrency(this.y) + '</strong>';
                 }
               }
             });
@@ -316,31 +319,15 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
     },
     title: {
       enabled: false,
-      text: ''
+      text: null
     },
     legend: {
+      enabled: false,
       borderWidth: 0
     },
     plotOptions: {
-      line: {
-        lineWidth: 4,
-        states: {
-          hover: {
-            lineWidth: 5
-          }
-        },
-        marker: {
-          fillColor: '#ffffff',
-          lineWidth: 2,
-          lineColor: null,
-          symbol: 'circle',
-          enabled: false,
-          states: {
-            hover: {
-              enabled: true
-            }
-          }
-        }
+      bar: {
+        minPointLength: 3
       }
     },
     xAxis: {
@@ -357,8 +344,8 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
     yAxis: {
       title: {
         enabled: false,
-        text: '[Update me]',
-        margin: 40,
+        text: 'US Dollars',
+        margin: 5,
         style: {
           color: 'inherit',
           fontWeight: 'normal'
@@ -383,9 +370,9 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
   return views;
 });
 
-define('text!templates/application.mustache',[],function () { return '<div class="message-container"></div>\n\n<div class="content-container">\n\n\n</div>\n\n<div class="footnote-container">\n  <div class="footnote">\n    <p>Some code, techniques, and data on <a href="https://github.com/zzolo/minnpost-campaign-finance" target="_blank">Github</a>.</p>\n  </div>\n</div>\n';});
+define('text!templates/application.mustache',[],function () { return '<div class="message-container"></div>\n\n<div class="content-container">\n\n\n</div>\n\n<div class="footnote-container">\n  <div class="footnote">\n    <p>Data from the <a href="http://www.fec.gov/" target="_blank">Federal Elections Committee</a> and the <a href="http://www.cfboard.state.mn.us/" target="_blank">Minnesota Campaign Finance and Public Disclosure Board</a>.  Some code, techniques, and data on <a href="https://github.com/zzolo/minnpost-campaign-finance" target="_blank">Github</a>.</p>\n  </div>\n</div>\n';});
 
-define('text!templates/contests.mustache',[],function () { return '<div class="contests">\n\n  {{#contests}}\n    {{>contest}}\n  {{/contests}}\n\n</div>\n\n\n<!-- {{>contest}} -->\n<div class="contest {{ id }}">\n  <h4>{{ name }}</h4>\n\n  <div class="contest-chart chart-{{ id }}"></div>\n\n  <table>\n    <thead>\n      <tr>\n        <th>Candidate</th><th>Amount raised</th><th>Cash on hand</th>\n      </tr>\n    </thead>\n\n    <tbody>\n      {{#candidates}}\n        <tr>\n          <td>{{ candidate }}</td>\n          <td>{{ formatters.formatCurrency(amountraised) }}</td>\n          <td>{{ formatters.formatCurrency(cashonhand) }}</td>\n        </tr>\n      {{/candidates}}\n    </tbody>\n  </table>\n\n</div>\n<!-- {{/contest}} -->\n';});
+define('text!templates/contests.mustache',[],function () { return '<div class="contests">\n\n  {{#contests}}\n    {{>contest}}\n  {{/contests}}\n\n</div>\n\n\n<!-- {{>contest}} -->\n<div class="contest {{ id }}">\n  <h4>{{ name }}</h4>\n\n  <div class="contest-chart chart-{{ id }}"></div>\n\n  <table>\n    <thead>\n      <tr>\n        <th></th>\n        <th>Candidate</th>\n        <th>Amount raised <span class="label-amount-raised"></span></th>\n        <th>Cash on hand <span class="label-cash-hand"></span></th>\n      </tr>\n    </thead>\n\n    <tbody>\n      {{#candidates}}\n        <tr>\n          <td><span class="party party-{{ party }}"></span></td>\n          <td>{{ candidate }}</td>\n          <td>\n            {{#(amountraised == 0)}}\n              <span class="no-data">(no data)</span>\n            {{/()}}\n            {{#(amountraised > 0)}}\n              {{ formatters.formatCurrency(amountraised) }}\n            {{/()}}\n          </td>\n          <td>{{ formatters.formatCurrency(cashonhand) }}</td>\n        </tr>\n      {{/candidates}}\n    </tbody>\n  </table>\n\n  <div class="time-span">\n    Data from {{ from.format(\'MMM Do, YYYY\') }} through {{ to.format(\'MMM Do, YYYY\') }}.\n  </div>\n\n</div>\n<!-- {{/contest}} -->\n';});
 
 define('text!templates/loading.mustache',[],function () { return '<div class="loading-container">\n  <div class="loading"><span>Loading...</span></div>\n</div>';});
 
@@ -466,7 +453,7 @@ define('routers', [
   return routers;
 });
 
-define('text!../data/campaign_finance_spreadsheet.json',[],function () { return '{"2014 Campaign Finances":[{"contest":"Governor","candidate":"Mark Dayton","incumbent":"Y","party":"DFL","amountraised":100000,"cashonhand":9999.38,"from":"","to":"","rowNumber":1},{"contest":"Governor","candidate":"Scott Honour","incumbent":"","party":"R","amountraised":999,"cashonhand":9,"from":"","to":"","rowNumber":2},{"contest":"Governor","candidate":"Kurt Zellers","incumbent":"","party":"R","amountraised":999,"cashonhand":9,"from":"","to":"","rowNumber":3},{"contest":"U.S. Senate","candidate":"Al Franken","incumbent":"Y","party":"D","amountraised":8619462.99,"cashonhand":3893286.11,"from":"7/1/2013","to":"9/30/2013","rowNumber":4},{"contest":"U.S. Senate","candidate":"Mike McFadden","incumbent":"","party":"R","amountraised":1468840.99,"cashonhand":1252087.2,"from":"7/1/2013","to":"9/30/2013","rowNumber":5},{"contest":"U.S. Senate","candidate":"Julianne Ortman","incumbent":"","party":"R","amountraised":119466,"cashonhand":88121.1,"from":"7/1/2013","to":"9/30/2013","rowNumber":6},{"contest":"U.S. Senate","candidate":"Jim Abeler","incumbent":"","party":"R","amountraised":54854,"cashonhand":34568.7,"from":"7/1/2013","to":"9/30/2013","rowNumber":7},{"contest":"U.S. Senate","candidate":"Chris Dahlberg","incumbent":"","party":"R","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":8},{"contest":"CD1","candidate":"Tim Walz","incumbent":"Y","party":"D","amountraised":479508.7,"cashonhand":238512.29,"from":"7/1/2013","to":"9/30/2013","rowNumber":9},{"contest":"CD1","candidate":"Mike Benson","incumbent":"","party":"R","amountraised":28158.36,"cashonhand":14707.85,"from":"7/1/2013","to":"9/30/2013","rowNumber":10},{"contest":"CD1","candidate":"Jim Hagedorn","incumbent":"","party":"R","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":11},{"contest":"CD1","candidate":"Aaron Miller","incumbent":"","party":"R","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":12},{"contest":"CD2","candidate":"John Kline","incumbent":"Y","party":"R","amountraised":1107528.4,"cashonhand":1307904.91,"from":"7/1/2013","to":"9/30/2013","rowNumber":13},{"contest":"CD2","candidate":"David Gerson","incumbent":"","party":"R","amountraised":5182,"cashonhand":2000.05,"from":"7/1/2013","to":"9/30/2013","rowNumber":14},{"contest":"CD2","candidate":"Mike Obermueller","incumbent":"","party":"D","amountraised":204353.2,"cashonhand":119453.55,"from":"7/1/2013","to":"9/30/2013","rowNumber":15},{"contest":"CD2","candidate":"Paula Overby","incumbent":"","party":"D","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":16},{"contest":"CD2","candidate":"Thomas Craft","incumbent":"","party":"D","amountraised":22230.78,"cashonhand":13508.7,"from":"7/1/2013","to":"9/30/2013","rowNumber":17},{"contest":"CD3","candidate":"Erik Paulsen","incumbent":"Y","party":"R","amountraised":1235371.01,"cashonhand":1526807.21,"from":"7/1/2013","to":"9/30/2013","rowNumber":18},{"contest":"CD4","candidate":"Betty McCollum","incumbent":"Y","party":"D","amountraised":261510.62,"cashonhand":89076.71,"from":"7/1/2013","to":"9/30/2013","rowNumber":19},{"contest":"CD5","candidate":"Keith Ellison","incumbent":"Y","party":"D","amountraised":719932.99,"cashonhand":186248.91,"from":"7/1/2013","to":"9/30/2013","rowNumber":20},{"contest":"CD6","candidate":"Tom Emmer","incumbent":"","party":"R","amountraised":373476.88,"cashonhand":274836.94,"from":"7/1/2013","to":"9/30/2013","rowNumber":21},{"contest":"CD6","candidate":"Phil Krinkie","incumbent":"","party":"R","amountraised":38243.01,"cashonhand":314880.29,"from":"7/1/2013","to":"9/30/2013","rowNumber":22},{"contest":"CD6","candidate":"Rhonda Sivarajah","incumbent":"","party":"R","amountraised":49128.31,"cashonhand":184332.22,"from":"7/1/2013","to":"9/30/2013","rowNumber":23},{"contest":"CD6","candidate":"Jim Read","incumbent":"","party":"D","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":24},{"contest":"CD7","candidate":"Collin Peterson","incumbent":"Y","party":"D","amountraised":363193.12,"cashonhand":227388.06,"from":"7/1/2013","to":"9/30/2013","rowNumber":25},{"contest":"CD7","candidate":"Torrey Westrom","incumbent":"","party":"R","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":26},{"contest":"CD8","candidate":"Rick Nolan","incumbent":"Y","party":"D","amountraised":418457.48,"cashonhand":261059.73,"from":"7/1/2013","to":"9/30/2013","rowNumber":27},{"contest":"CD8","candidate":"Stewart Mills","incumbent":"","party":"R","amountraised":243826.3,"cashonhand":234442.53,"from":"7/1/2013","to":"9/30/2013","rowNumber":28}]}';});
+define('text!../data/campaign_finance_spreadsheet.json',[],function () { return '{"2014 Campaign Finances":[{"contest":"Governor","candidate":"Mark Dayton","incumbent":"Y","party":"D","amountraised":100000,"cashonhand":9999.38,"from":"","to":"","rowNumber":1},{"contest":"Governor","candidate":"Scott Honour","incumbent":"","party":"R","amountraised":999,"cashonhand":9,"from":"","to":"","rowNumber":2},{"contest":"Governor","candidate":"Kurt Zellers","incumbent":"","party":"R","amountraised":999,"cashonhand":9,"from":"","to":"","rowNumber":3},{"contest":"U.S. Senate","candidate":"Al Franken","incumbent":"Y","party":"D","amountraised":8619462.99,"cashonhand":3893286.11,"from":"7/1/2013","to":"9/30/2013","rowNumber":4},{"contest":"U.S. Senate","candidate":"Mike McFadden","incumbent":"","party":"R","amountraised":1468840.99,"cashonhand":1252087.2,"from":"7/1/2013","to":"9/30/2013","rowNumber":5},{"contest":"U.S. Senate","candidate":"Julianne Ortman","incumbent":"","party":"R","amountraised":119466,"cashonhand":88121.1,"from":"7/1/2013","to":"9/30/2013","rowNumber":6},{"contest":"U.S. Senate","candidate":"Jim Abeler","incumbent":"","party":"R","amountraised":54854,"cashonhand":34568.7,"from":"7/1/2013","to":"9/30/2013","rowNumber":7},{"contest":"U.S. Senate","candidate":"Chris Dahlberg","incumbent":"","party":"R","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":8},{"contest":"Conressional District 1","candidate":"Tim Walz","incumbent":"Y","party":"D","amountraised":479508.7,"cashonhand":238512.29,"from":"7/1/2013","to":"9/30/2013","rowNumber":9},{"contest":"Conressional District 1","candidate":"Mike Benson","incumbent":"","party":"R","amountraised":28158.36,"cashonhand":14707.85,"from":"7/1/2013","to":"9/30/2013","rowNumber":10},{"contest":"Conressional District 1","candidate":"Jim Hagedorn","incumbent":"","party":"R","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":11},{"contest":"Conressional District 1","candidate":"Aaron Miller","incumbent":"","party":"R","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":12},{"contest":"Conressional District 2","candidate":"John Kline","incumbent":"Y","party":"R","amountraised":1107528.4,"cashonhand":1307904.91,"from":"7/1/2013","to":"9/30/2013","rowNumber":13},{"contest":"Conressional District 2","candidate":"David Gerson","incumbent":"","party":"R","amountraised":5182,"cashonhand":2000.05,"from":"7/1/2013","to":"9/30/2013","rowNumber":14},{"contest":"Conressional District 2","candidate":"Mike Obermueller","incumbent":"","party":"D","amountraised":204353.2,"cashonhand":119453.55,"from":"7/1/2013","to":"9/30/2013","rowNumber":15},{"contest":"Conressional District 2","candidate":"Paula Overby","incumbent":"","party":"D","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":16},{"contest":"Conressional District 2","candidate":"Thomas Craft","incumbent":"","party":"D","amountraised":22230.78,"cashonhand":13508.7,"from":"7/1/2013","to":"9/30/2013","rowNumber":17},{"contest":"Conressional District 3","candidate":"Erik Paulsen","incumbent":"Y","party":"R","amountraised":1235371.01,"cashonhand":1526807.21,"from":"7/1/2013","to":"9/30/2013","rowNumber":18},{"contest":"Conressional District 4","candidate":"Betty McCollum","incumbent":"Y","party":"D","amountraised":261510.62,"cashonhand":89076.71,"from":"7/1/2013","to":"9/30/2013","rowNumber":19},{"contest":"Conressional District 5","candidate":"Keith Ellison","incumbent":"Y","party":"D","amountraised":719932.99,"cashonhand":186248.91,"from":"7/1/2013","to":"9/30/2013","rowNumber":20},{"contest":"Conressional District 6","candidate":"Tom Emmer","incumbent":"","party":"R","amountraised":373476.88,"cashonhand":274836.94,"from":"7/1/2013","to":"9/30/2013","rowNumber":21},{"contest":"Conressional District 6","candidate":"Phil Krinkie","incumbent":"","party":"R","amountraised":38243.01,"cashonhand":314880.29,"from":"7/1/2013","to":"9/30/2013","rowNumber":22},{"contest":"Conressional District 6","candidate":"Rhonda Sivarajah","incumbent":"","party":"R","amountraised":49128.31,"cashonhand":184332.22,"from":"7/1/2013","to":"9/30/2013","rowNumber":23},{"contest":"Conressional District 6","candidate":"Jim Read","incumbent":"","party":"D","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":24},{"contest":"Conressional District 7","candidate":"Collin Peterson","incumbent":"Y","party":"D","amountraised":363193.12,"cashonhand":227388.06,"from":"7/1/2013","to":"9/30/2013","rowNumber":25},{"contest":"Conressional District 7","candidate":"Torrey Westrom","incumbent":"","party":"R","amountraised":"","cashonhand":"","from":"","to":"","rowNumber":26},{"contest":"Conressional District 8","candidate":"Rick Nolan","incumbent":"Y","party":"D","amountraised":418457.48,"cashonhand":261059.73,"from":"7/1/2013","to":"9/30/2013","rowNumber":27},{"contest":"Conressional District 8","candidate":"Stewart Mills","incumbent":"","party":"R","amountraised":243826.3,"cashonhand":234442.53,"from":"7/1/2013","to":"9/30/2013","rowNumber":28}]}';});
 
 /**
  * Main application file for: minnpost-campaign-finance
@@ -475,10 +462,10 @@ define('text!../data/campaign_finance_spreadsheet.json',[],function () { return 
  * and creates the main object for the application.
  */
 define('minnpost-campaign-finance', [
-  'underscore', 'helpers', 'routers', 'collections',
+  'underscore', 'moment', 'helpers', 'routers', 'collections',
   'text!../data/campaign_finance_spreadsheet.json'
 ],
-  function(_, helpers, routers, collections, dCFS) {
+  function(_, moment, helpers, routers, collections, dCFS) {
 
   // Constructor for app
   var App = function(options) {
@@ -519,6 +506,12 @@ define('minnpost-campaign-finance', [
       var contest = {};
       contest.name = ci;
       contest.id = this.identifier(ci);
+      contest.from = moment(_.max(candidates, function(c, ci) {
+        return moment(c.from).unix();
+      }).from);
+      contest.to = moment(_.max(candidates, function(c, ci) {
+        return moment(c.to).unix();
+      }).to);
       contest.candidates = new collections.Candidates(candidates, {
         app: this
       });
