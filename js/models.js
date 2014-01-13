@@ -24,10 +24,9 @@ define('models', ['underscore', 'Backbone', 'helpers'],
 
   // Candidate
   models.Candidate = models.Base.extend({
-    initialize: function() {
+    initialize: function(data, options) {
       models.Candidate.__super__.initialize.apply(this, arguments);
     }
-
   });
 
   // Return what we have

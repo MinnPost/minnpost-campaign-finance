@@ -16,20 +16,35 @@
   <table>
     <thead>
       <tr>
-        <th>Candidate</th><th>Amount raised</th><th>Cash on hand</th>
+        <th></th>
+        <th>Candidate</th>
+        <th>Amount raised <span class="label-amount-raised"></span></th>
+        <th>Cash on hand <span class="label-cash-hand"></span></th>
       </tr>
     </thead>
 
     <tbody>
       {{#candidates}}
         <tr>
+          <td><span class="party party-{{ party }}"></span></td>
           <td>{{ candidate }}</td>
-          <td>{{ formatters.formatCurrency(amountraised) }}</td>
+          <td>
+            {{#(amountraised == 0)}}
+              <span class="no-data">(no data)</span>
+            {{/()}}
+            {{#(amountraised > 0)}}
+              {{ formatters.formatCurrency(amountraised) }}
+            {{/()}}
+          </td>
           <td>{{ formatters.formatCurrency(cashonhand) }}</td>
         </tr>
       {{/candidates}}
     </tbody>
   </table>
+
+  <div class="time-span">
+    Data from {{ from.format('MMM Do, YYYY') }} through {{ to.format('MMM Do, YYYY') }}.
+  </div>
 
 </div>
 <!-- {{/contest}} -->

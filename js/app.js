@@ -5,10 +5,10 @@
  * and creates the main object for the application.
  */
 define('minnpost-campaign-finance', [
-  'underscore', 'helpers', 'routers', 'collections',
+  'underscore', 'moment', 'helpers', 'routers', 'collections',
   'text!../data/campaign_finance_spreadsheet.json'
 ],
-  function(_, helpers, routers, collections, dCFS) {
+  function(_, moment, helpers, routers, collections, dCFS) {
 
   // Constructor for app
   var App = function(options) {
@@ -49,6 +49,12 @@ define('minnpost-campaign-finance', [
       var contest = {};
       contest.name = ci;
       contest.id = this.identifier(ci);
+      contest.from = moment(_.max(candidates, function(c, ci) {
+        return moment(c.from).unix();
+      }).from);
+      contest.to = moment(_.max(candidates, function(c, ci) {
+        return moment(c.to).unix();
+      }).to);
       contest.candidates = new collections.Candidates(candidates, {
         app: this
       });

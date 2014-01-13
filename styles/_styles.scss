@@ -77,14 +77,28 @@ body .node-unpublished {
     width: 100%;
     margin-bottom: 2em;
 
+    thead {
+
+      th {
+        border-bottom: 2px solid $color-light-gray;
+      }
+    }
+
     tbody {
 
       tr {
 
+        &:nth-child(even) td {
+          background-color: $color-lightest-gray;
+        }
         td:first-child {
-          width: 50%;
+          width: 5%;
+          text-align: center;
         }
         td:nth-child(2) {
+          width: 50%;
+        }
+        td:nth-child(3) {
           width: 20%;
         }
       }
@@ -93,8 +107,55 @@ body .node-unpublished {
 
   .contests {
 
+    h4 {
+      margin-bottom: .5em;
+      text-transform: uppercase;
+    }
+
+    .label-block {
+      @include inline-block();
+      @include border-radius(2px);
+      height: .85em;
+      width: .85em;
+      vertical-align: middle;
+      margin-left: .25em;
+    }
+    .label-amount-raised {
+      @extend .label-block;
+      background-color: #1DA595;
+    }
+    .label-cash-hand {
+      @extend .label-block;
+      background-color: #1D71A5;
+    }
+
+    .party {
+      @include inline-block();
+      @include border-radius(2px);
+      height: 1em;
+      width: 1em;
+
+      &.party-D {
+        background-color: #52AAE0;
+      }
+      &.party-R {
+        background-color: #D02539;
+      }
+    }
+
+    .time-span {
+      text-align: right;
+      color: $color-light-gray;
+    }
+
     .contest {
-      margin-bottom: 3em;
+      margin-bottom: 6em;
+
+      .no-data {
+        font-style: italic;
+        color: $color-light-gray;
+        font-size: .85em;
+      }
 
       .contest-chart {
         width: 100%;

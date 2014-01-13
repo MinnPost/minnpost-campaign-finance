@@ -52,7 +52,7 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
               }],
               tooltip: {
                 formatter: function() {
-                  return this.key + ' <br /> ' + this.series.name + ': <strong>' + helpers.formatCurrency(this.y) + '</strong>';
+                  return '<strong>' + this.key + '</strong> <br /> <br /> ' + this.series.name + ': <strong>' + helpers.formatCurrency(this.y) + '</strong>';
                 }
               }
             });
@@ -79,31 +79,15 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
     },
     title: {
       enabled: false,
-      text: ''
+      text: null
     },
     legend: {
+      enabled: false,
       borderWidth: 0
     },
     plotOptions: {
-      line: {
-        lineWidth: 4,
-        states: {
-          hover: {
-            lineWidth: 5
-          }
-        },
-        marker: {
-          fillColor: '#ffffff',
-          lineWidth: 2,
-          lineColor: null,
-          symbol: 'circle',
-          enabled: false,
-          states: {
-            hover: {
-              enabled: true
-            }
-          }
-        }
+      bar: {
+        minPointLength: 3
       }
     },
     xAxis: {
@@ -120,8 +104,8 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
     yAxis: {
       title: {
         enabled: false,
-        text: '[Update me]',
-        margin: 40,
+        text: 'US Dollars',
+        margin: 5,
         style: {
           color: 'inherit',
           fontWeight: 'normal'

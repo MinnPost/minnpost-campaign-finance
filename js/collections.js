@@ -26,6 +26,10 @@ define('collections', ['underscore', 'Backbone', 'helpers', 'models'],
   collections.Candidates = collections.Base.extend({
     initialize: function() {
       collections.Candidates.__super__.initialize.apply(this, arguments);
+    },
+
+    comparator: function(model) {
+      return model.get('amountraised') * -1;
     }
   });
 
