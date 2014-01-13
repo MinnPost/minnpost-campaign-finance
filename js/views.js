@@ -5,8 +5,8 @@
  * Ractive classes can be extended but we still need a number of
  * things at instantian, like templates
  */
-define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
-  function(_, $, Ractive, Highcharts, helpers) {
+define('views', ['underscore', 'jquery', 'Ractive', 'Ractive-events-tap', 'Highcharts', 'helpers'],
+  function(_, $, Ractive, RTap, Highcharts, helpers) {
   var views = {};
   var defaultChartOptions;
 
@@ -29,6 +29,23 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
     init: function() {
       this.baseInit.apply(this, arguments);
 
+      // Handle interval update
+      this.on('updateInterval', function(e) {
+        e.original.preventDefault();
+        var $link = $(e.node);
+        var $links = $link.parent().find('a');
+        var newID = $link.data('id');
+        var kSplit = e.keypath.split('.');
+        var contestPath = kSplit[0] + '.' + kSplit[1];
+        var contest = this.get(contestPath);
+        var currentInterval = _.find(contest.intervals, function(i, ii) {
+          return i.id === newID;
+        });
+
+        // Update current interval
+        this.set(contestPath + '.currentInterval', currentInterval);
+      });
+
       // Look for contests to then make charts
       this.observe('contests', function(n, o) {
         var thisView = this;
@@ -36,28 +53,36 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
 
         if (!_.isUndefined(n)) {
           _.each(n, function(contest, ci) {
+
+            // Create a wrapper for plucking
+            var pluck = function(collection, property) {
+              return _.map(collection, function(c, ci) {
+                return c.get(property);
+              });
+            };
+
+            // Only get the candidates in the current interval
+            var candidates = contest.candidates.filter(function(c, ci) {
+              return (c.get('interval') === contest.currentInterval.name);
+            });
+
             // Make chart options and add data
             options = _.clone(defaultChartOptions);
             options = $.extend(true, options, {
               xAxis: {
-                categories: contest.candidates.pluck('candidate')
+                categories: pluck(candidates, 'candidate')
               },
               series: [{
                 name: 'Cash on hand',
-                data: contest.candidates.pluck('cashonhand')
+                data: pluck(candidates, 'cashonhand')
               },
               {
                 name: 'Amount raised',
-                data: contest.candidates.pluck('amountraised')
-              }],
-              tooltip: {
-                formatter: function() {
-                  return '<strong>' + this.key + '</strong> <br /> <br /> ' + this.series.name + ': <strong>' + helpers.formatCurrency(this.y) + '</strong>';
-                }
-              }
+                data: pluck(candidates, 'amountraised')
+              }]
             });
 
-            $(this.el).find('.chart-' + contest.id).highcharts(options);
+            var chart = $(this.el).find('.chart-' + contest.id).highcharts(options);
           }, this);
         }
       });
@@ -121,7 +146,7 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Highcharts', 'helpers'],
       style: {},
       useHTML: true,
       formatter: function() {
-        return this.key + ': <strong>' + this.y + '</strong>';
+        return '<strong>' + this.key + '</strong> <br /> <br /> ' + this.series.name + ': <strong>' + helpers.formatCurrency(this.y) + '</strong>';
       }
     }
   };

@@ -77,9 +77,18 @@ body .node-unpublished {
     width: 100%;
     margin-bottom: 2em;
 
+    th:nth-child(4),
+    th:nth-child(5),
+    td:nth-child(4),
+    td:nth-child(5) {
+      text-align: right;
+    }
+
     thead {
 
       th {
+        padding-right: .5em;
+        padding-left: .5em;
         border-bottom: 2px solid $color-light-gray;
       }
     }
@@ -91,14 +100,15 @@ body .node-unpublished {
         &:nth-child(even) td {
           background-color: $color-lightest-gray;
         }
-        td:first-child {
-          width: 5%;
+        td:first-child,
+        td:nth-child(2) {
+          width: 3%;
           text-align: center;
         }
-        td:nth-child(2) {
+        td:nth-child(3) {
           width: 50%;
         }
-        td:nth-child(3) {
+        td:nth-child(4) {
           width: 20%;
         }
       }
@@ -112,13 +122,19 @@ body .node-unpublished {
       text-transform: uppercase;
     }
 
+    a .fa {
+      color: $color-dark-gray;
+      vertical-align: baseline;
+    }
+
     .label-block {
       @include inline-block();
       @include border-radius(2px);
       height: .85em;
       width: .85em;
-      vertical-align: middle;
       margin-left: .25em;
+      line-height: 1;
+      vertical-align: baseline;
     }
     .label-amount-raised {
       @extend .label-block;
@@ -134,12 +150,28 @@ body .node-unpublished {
       @include border-radius(2px);
       height: 1em;
       width: 1em;
+      line-height: 1;
+      vertical-align: baseline;
 
       &.party-D {
         background-color: #52AAE0;
       }
       &.party-R {
         background-color: #D02539;
+      }
+    }
+
+    .intervals {
+      margin-bottom: .5em;
+
+      a {
+        @include inline-block();
+        margin-right: .5em;
+
+        &.active {
+          font-weight: bold;
+          text-decoration: underline !important;
+        }
       }
     }
 
@@ -151,7 +183,8 @@ body .node-unpublished {
     .contest {
       margin-bottom: 6em;
 
-      .no-data {
+      .no-data,
+      .incumbent {
         font-style: italic;
         color: $color-light-gray;
         font-size: .85em;

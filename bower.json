@@ -24,6 +24,7 @@
     "moment": "~2.4.0",
     "requirejs": "~2.1.9",
     "text": "~2.0.10",
-    "highcharts": "~3.0.7"
+    "highcharts": "~3.0.7",
+    "font-awesome": "~4.0.3"
   }
 }

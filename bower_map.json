@@ -75,5 +75,11 @@
     ],
     "rname": "Highcharts",
     "returns": "Highcharts"
+  },
+  "font-awesome": {
+    "css": [
+      "font-awesome/css/font-awesome.min"
+    ],
+    "rname": "FontAwesome"
   }
 }

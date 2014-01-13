@@ -47,14 +47,29 @@ define('minnpost-campaign-finance', [
     this.contests = [];
     _.each(data, function(candidates, ci) {
       var contest = {};
+
+      // Top level values
       contest.name = ci;
       contest.id = this.identifier(ci);
-      contest.from = moment(_.max(candidates, function(c, ci) {
-        return moment(c.from).unix();
-      }).from);
-      contest.to = moment(_.max(candidates, function(c, ci) {
-        return moment(c.to).unix();
-      }).to);
+
+      // Get intervals.
+      contest.intervals = {};
+      _.each(candidates, function(c, ci) {
+        if (c.from && c.to) {
+          contest.intervals[this.identifier(c.interval)] = {
+            id: this.identifier(c.interval),
+            name: c.interval,
+            from: moment(c.from),
+            to: moment(c.to)
+          };
+        }
+      }, this);
+      contest.intervals = _.sortBy(contest.intervals, function(i, ii) {
+        return i.to.unix() * -1;
+      });
+      contest.currentInterval = contest.intervals[0];
+
+      // Create candidate collections
       contest.candidates = new collections.Candidates(candidates, {
         app: this
       });
