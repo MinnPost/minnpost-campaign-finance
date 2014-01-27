@@ -44,48 +44,61 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Ractive-events-tap', 'Highc
 
         // Update current interval
         this.set(contestPath + '.currentInterval', currentInterval);
+
+        // Scroll to
+        this.scrollToContest(kSplit[1]);
       });
 
-      // Look for contests to then make charts
-      this.observe('contests', function(n, o) {
-        var thisView = this;
-        var options;
+      // There is no way to use wildcards, so we look at the
+      // the data that comes in and create observers on that so
+      // that we only change what needs to be changed
+      _.each(this.data.contests, function(c, ci) {
+        this.observe('contests.' + ci.toString(), function(n, o) {
+          if (!_.isUndefined(n)) {
+            this.updateChart(n);
+          }
+        });
+      }, this);
+    },
 
-        if (!_.isUndefined(n)) {
-          _.each(n, function(contest, ci) {
+    // Update chart for specific contest
+    updateChart: function(contest) {
+      // Create a wrapper for plucking
+      var pluck = function(collection, property) {
+        return _.map(collection, function(c, ci) {
+          return c.get(property);
+        });
+      };
 
-            // Create a wrapper for plucking
-            var pluck = function(collection, property) {
-              return _.map(collection, function(c, ci) {
-                return c.get(property);
-              });
-            };
-
-            // Only get the candidates in the current interval
-            var candidates = contest.candidates.filter(function(c, ci) {
-              return (c.get('interval') === contest.currentInterval.name);
-            });
-
-            // Make chart options and add data
-            options = _.clone(defaultChartOptions);
-            options = $.extend(true, options, {
-              xAxis: {
-                categories: pluck(candidates, 'candidate')
-              },
-              series: [{
-                name: 'Cash on hand',
-                data: pluck(candidates, 'cashonhand')
-              },
-              {
-                name: 'Amount raised',
-                data: pluck(candidates, 'amountraised')
-              }]
-            });
-
-            var chart = $(this.el).find('.chart-' + contest.id).highcharts(options);
-          }, this);
-        }
+      // Only get the candidates in the current interval
+      var candidates = contest.candidates.filter(function(c, ci) {
+        return (c.get('interval') === contest.currentInterval.name);
       });
+
+      // Make chart options and add data
+      options = _.clone(defaultChartOptions);
+      options = $.extend(true, options, {
+        xAxis: {
+          categories: pluck(candidates, 'candidate')
+        },
+        series: [{
+          name: 'Cash on hand',
+          data: pluck(candidates, 'cashonhand')
+        },
+        {
+          name: 'Amount raised',
+          data: pluck(candidates, 'amountraised')
+        }]
+      });
+
+      var chart = $(this.el).find('.chart-' + contest.id).highcharts(options);
+    },
+
+    // Scroll to contest
+    scrollToContest: function(id) {
+      var contest = this.get('contests.' + id.toString());
+      var top = $('.' + contest.id).offset().top;
+      $('html, body').animate({ scrollTop: top - 15 }, 500, 'swing');
     }
   });
 
