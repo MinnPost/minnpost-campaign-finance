@@ -198,7 +198,23 @@ body .node-unpublished {
     }
   }
 
+
   // Breakpoints
-  @media screen and (max-width: 768px) {
+  @media screen and (max-width: 500px) {
+
+    // Responsive table contaainer
+    .responsive-table {
+      width: 100%;
+      margin-bottom: 2em;
+      overflow-x: scroll;
+      overflow-y: hidden;
+      border: 1px solid $color-medium-gray;
+      -ms-overflow-style: -ms-autohiding-scrollbar;
+      -webkit-overflow-scrolling: touch;
+
+      table {
+        margin-bottom: 0;
+      }
+    }
   }
 }

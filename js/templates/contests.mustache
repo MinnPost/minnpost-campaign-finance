@@ -19,49 +19,51 @@
 
   <div class="contest-chart chart-{{ id }}"></div>
 
-  <table>
-    <thead>
-      <tr>
-        <th></th>
-        <th></th>
-        <th>Candidate</th>
-        <th>Amount raised <span class="label-amount-raised"></span></th>
-        <th>Cash on hand <span class="label-cash-hand"></span></th>
-      </tr>
-    </thead>
+  <div class="responsive-table">
+    <table>
+      <thead>
+        <tr>
+          <th></th>
+          <th></th>
+          <th>Candidate</th>
+          <th>Amount raised <span class="label-amount-raised"></span></th>
+          <th>Cash on hand <span class="label-cash-hand"></span></th>
+        </tr>
+      </thead>
 
-    <tbody>
-      {{#candidates}}
-        {{#(currentInterval.name === interval)}}
-          <tr>
-            <td>
-              <span class="party party-{{ party }}"></span>
-            </td>
-            <td>
-              {{#reporturl}}
-                <a href="{{ reporturl }}" target="_blank" title="Report"><i class="fa fa-file-o"></i></a>
-              {{/reporturl}}
-            </td>
-            <td>
-              {{ candidate }}
-              {{#(incumbent === 'Y')}}
-                <span class="incumbent">(incumbent)</span>
-              {{/()}}
-            </td>
-            <td>
-              {{#(amountraised == 0)}}
-                <span class="no-data">(no data)</span>
-              {{/()}}
-              {{#(amountraised > 0)}}
-                {{ formatters.formatCurrency(amountraised) }}
-              {{/()}}
-            </td>
-            <td>{{ formatters.formatCurrency(cashonhand) }}</td>
-          </tr>
-        {{/()}}
-      {{/candidates}}
-    </tbody>
-  </table>
+      <tbody>
+        {{#candidates}}
+          {{#(currentInterval.name === interval)}}
+            <tr>
+              <td>
+                <span class="party party-{{ party }}"></span>
+              </td>
+              <td>
+                {{#reporturl}}
+                  <a href="{{ reporturl }}" target="_blank" title="Report"><i class="fa fa-file-o"></i></a>
+                {{/reporturl}}
+              </td>
+              <td>
+                {{ candidate }}
+                {{#(incumbent === 'Y')}}
+                  <span class="incumbent">(incumbent)</span>
+                {{/()}}
+              </td>
+              <td>
+                {{#(amountraised == 0)}}
+                  <span class="no-data">(no data)</span>
+                {{/()}}
+                {{#(amountraised > 0)}}
+                  {{ formatters.formatCurrency(amountraised) }}
+                {{/()}}
+              </td>
+              <td>{{ formatters.formatCurrency(cashonhand) }}</td>
+            </tr>
+          {{/()}}
+        {{/candidates}}
+      </tbody>
+    </table>
+  </div>
 
   <div class="time-span">
     Data from {{ currentInterval.from.format('MMM Do, YYYY') }} through {{ currentInterval.to.format('MMM Do, YYYY') }}.
