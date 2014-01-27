@@ -13,12 +13,7 @@ require.config({
     },
     'Highcharts': {
       exports: 'Highcharts',
-      'deps': [ 'jquery']
-    },
-    // Mapbox and requireJS don't really work, so we just let
-    // the L be global
-    'mapbox': {
-      exports: 'mapbox'
+      'deps': ['jquery']
     }
   },
   baseUrl: 'js',

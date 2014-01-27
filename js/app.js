@@ -5,10 +5,10 @@
  * and creates the main object for the application.
  */
 define('minnpost-campaign-finance', [
-  'underscore', 'moment', 'helpers', 'routers', 'collections',
+  'jquery', 'underscore', 'Backbone', 'Highcharts', 'moment', 'helpers', 'routers', 'collections',
   'text!../data/campaign_finance_spreadsheet.json'
 ],
-  function(_, moment, helpers, routers, collections, dCFS) {
+  function($, _, Backbone, Highcharts, moment, helpers, routers, collections, dCFS) {
 
   // Constructor for app
   var App = function(options) {
