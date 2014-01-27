@@ -284,48 +284,61 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Ractive-events-tap', 'Highc
 
         // Update current interval
         this.set(contestPath + '.currentInterval', currentInterval);
+
+        // Scroll to
+        this.scrollToContest(kSplit[1]);
       });
 
-      // Look for contests to then make charts
-      this.observe('contests', function(n, o) {
-        var thisView = this;
-        var options;
+      // There is no way to use wildcards, so we look at the
+      // the data that comes in and create observers on that so
+      // that we only change what needs to be changed
+      _.each(this.data.contests, function(c, ci) {
+        this.observe('contests.' + ci.toString(), function(n, o) {
+          if (!_.isUndefined(n)) {
+            this.updateChart(n);
+          }
+        });
+      }, this);
+    },
 
-        if (!_.isUndefined(n)) {
-          _.each(n, function(contest, ci) {
+    // Update chart for specific contest
+    updateChart: function(contest) {
+      // Create a wrapper for plucking
+      var pluck = function(collection, property) {
+        return _.map(collection, function(c, ci) {
+          return c.get(property);
+        });
+      };
 
-            // Create a wrapper for plucking
-            var pluck = function(collection, property) {
-              return _.map(collection, function(c, ci) {
-                return c.get(property);
-              });
-            };
-
-            // Only get the candidates in the current interval
-            var candidates = contest.candidates.filter(function(c, ci) {
-              return (c.get('interval') === contest.currentInterval.name);
-            });
-
-            // Make chart options and add data
-            options = _.clone(defaultChartOptions);
-            options = $.extend(true, options, {
-              xAxis: {
-                categories: pluck(candidates, 'candidate')
-              },
-              series: [{
-                name: 'Cash on hand',
-                data: pluck(candidates, 'cashonhand')
-              },
-              {
-                name: 'Amount raised',
-                data: pluck(candidates, 'amountraised')
-              }]
-            });
-
-            var chart = $(this.el).find('.chart-' + contest.id).highcharts(options);
-          }, this);
-        }
+      // Only get the candidates in the current interval
+      var candidates = contest.candidates.filter(function(c, ci) {
+        return (c.get('interval') === contest.currentInterval.name);
       });
+
+      // Make chart options and add data
+      options = _.clone(defaultChartOptions);
+      options = $.extend(true, options, {
+        xAxis: {
+          categories: pluck(candidates, 'candidate')
+        },
+        series: [{
+          name: 'Cash on hand',
+          data: pluck(candidates, 'cashonhand')
+        },
+        {
+          name: 'Amount raised',
+          data: pluck(candidates, 'amountraised')
+        }]
+      });
+
+      var chart = $(this.el).find('.chart-' + contest.id).highcharts(options);
+    },
+
+    // Scroll to contest
+    scrollToContest: function(id) {
+      var contest = this.get('contests.' + id.toString());
+      var top = $('.' + contest.id).offset().top;
+      $('html, body').animate({ scrollTop: top - 15 }, 500, 'swing');
     }
   });
 
@@ -397,7 +410,7 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Ractive-events-tap', 'Highc
 
 define('text!templates/application.mustache',[],function () { return '<div class="message-container"></div>\n\n<div class="content-container">\n\n\n</div>\n\n<div class="footnote-container">\n  <div class="footnote">\n    <p>Data from the <a href="http://www.fec.gov/" target="_blank">Federal Elections Committee</a> and the <a href="http://www.cfboard.state.mn.us/" target="_blank">Minnesota Campaign Finance and Public Disclosure Board</a>.  Some code, techniques, and data on <a href="https://github.com/zzolo/minnpost-campaign-finance" target="_blank">Github</a>.</p>\n  </div>\n</div>\n';});
 
-define('text!templates/contests.mustache',[],function () { return '<div class="contests">\n\n  {{#contests}}\n    {{>contest}}\n  {{/contests}}\n\n</div>\n\n\n<!-- {{>contest}} -->\n<div class="contest {{ id }}">\n  <h4>{{ name }}</h4>\n\n  <div class="intervals">\n    {{#intervals}}\n      <a href="#" data-id="{{ id }}" on-tap="updateInterval" class="{{#(id === currentInterval.id)}}active{{/()}}">{{ name }}</a>\n    {{/intervals}}\n  </div>\n\n  <div class="contest-chart chart-{{ id }}"></div>\n\n  <table>\n    <thead>\n      <tr>\n        <th></th>\n        <th></th>\n        <th>Candidate</th>\n        <th>Amount raised <span class="label-amount-raised"></span></th>\n        <th>Cash on hand <span class="label-cash-hand"></span></th>\n      </tr>\n    </thead>\n\n    <tbody>\n      {{#candidates}}\n        {{#(currentInterval.name === interval)}}\n          <tr>\n            <td>\n              <span class="party party-{{ party }}"></span>\n            </td>\n            <td>\n              {{#reporturl}}\n                <a href="{{ reporturl }}" target="_blank" title="Report"><i class="fa fa-file-o"></i></a>\n              {{/reporturl}}\n            </td>\n            <td>\n              {{ candidate }}\n              {{#(incumbent === \'Y\')}}\n                <span class="incumbent">(incumbent)</span>\n              {{/()}}\n            </td>\n            <td>\n              {{#(amountraised == 0)}}\n                <span class="no-data">(no data)</span>\n              {{/()}}\n              {{#(amountraised > 0)}}\n                {{ formatters.formatCurrency(amountraised) }}\n              {{/()}}\n            </td>\n            <td>{{ formatters.formatCurrency(cashonhand) }}</td>\n          </tr>\n        {{/()}}\n      {{/candidates}}\n    </tbody>\n  </table>\n\n  <div class="time-span">\n    Data from {{ currentInterval.from.format(\'MMM Do, YYYY\') }} through {{ currentInterval.to.format(\'MMM Do, YYYY\') }}.\n  </div>\n\n</div>\n<!-- {{/contest}} -->\n';});
+define('text!templates/contests.mustache',[],function () { return '<div class="contests">\n\n  {{#contests}}\n    {{>contest}}\n  {{/contests}}\n\n</div>\n\n\n<!-- {{>contest}} -->\n<div class="contest {{ id }}">\n  <h4>{{ name }}</h4>\n\n  <div class="intervals">\n    {{#intervals}}\n      <a href="#" data-id="{{ id }}" on-tap="updateInterval" class="{{#(id === currentInterval.id)}}active{{/()}}">{{ name }}</a>\n    {{/intervals}}\n  </div>\n\n  <div class="contest-chart chart-{{ id }}"></div>\n\n  <div class="responsive-table">\n    <table>\n      <thead>\n        <tr>\n          <th></th>\n          <th></th>\n          <th>Candidate</th>\n          <th>Amount raised <span class="label-amount-raised"></span></th>\n          <th>Cash on hand <span class="label-cash-hand"></span></th>\n        </tr>\n      </thead>\n\n      <tbody>\n        {{#candidates}}\n          {{#(currentInterval.name === interval)}}\n            <tr>\n              <td>\n                <span class="party party-{{ party }}"></span>\n              </td>\n              <td>\n                {{#reporturl}}\n                  <a href="{{ reporturl }}" target="_blank" title="Report"><i class="fa fa-file-o"></i></a>\n                {{/reporturl}}\n              </td>\n              <td>\n                {{ candidate }}\n                {{#(incumbent === \'Y\')}}\n                  <span class="incumbent">(incumbent)</span>\n                {{/()}}\n              </td>\n              <td>\n                {{#(amountraised == 0)}}\n                  <span class="no-data">(no data)</span>\n                {{/()}}\n                {{#(amountraised > 0)}}\n                  {{ formatters.formatCurrency(amountraised) }}\n                {{/()}}\n              </td>\n              <td>{{ formatters.formatCurrency(cashonhand) }}</td>\n            </tr>\n          {{/()}}\n        {{/candidates}}\n      </tbody>\n    </table>\n  </div>\n\n  <div class="time-span">\n    Data from {{ currentInterval.from.format(\'MMM Do, YYYY\') }} through {{ currentInterval.to.format(\'MMM Do, YYYY\') }}.\n  </div>\n\n</div>\n<!-- {{/contest}} -->\n';});
 
 define('text!templates/loading.mustache',[],function () { return '<div class="loading-container">\n  <div class="loading"><span>Loading...</span></div>\n</div>';});
 
@@ -487,10 +500,10 @@ define('text!../data/campaign_finance_spreadsheet.json',[],function () { return 
  * and creates the main object for the application.
  */
 define('minnpost-campaign-finance', [
-  'underscore', 'moment', 'helpers', 'routers', 'collections',
+  'jquery', 'underscore', 'Backbone', 'Highcharts', 'moment', 'helpers', 'routers', 'collections',
   'text!../data/campaign_finance_spreadsheet.json'
 ],
-  function(_, moment, helpers, routers, collections, dCFS) {
+  function($, _, Backbone, Highcharts, moment, helpers, routers, collections, dCFS) {
 
   // Constructor for app
   var App = function(options) {
