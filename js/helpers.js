@@ -55,7 +55,7 @@ define('helpers', ['jquery', 'underscore', 'Backbone'],
      * Creates identifier for things like CSS classes.
      */
     identifier: function(str) {
-      return str.toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-').replace(/[^\w-]+/g,'');
+      return str.toString().toLowerCase().replace(/[^\w ]+/g,'').replace(/ +/g,'-').replace(/[^\w-]+/g,'');
     },
 
     /**

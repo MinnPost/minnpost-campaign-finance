@@ -39,8 +39,15 @@ define('minnpost-campaign-finance', [
   // Load up the data
   App.prototype.loadData = function() {
     var data = JSON.parse(dCFS);
-    var sheet = '2014 Campaign Finances';
-    data = data[sheet];
+    var title = '2014 Campaign Finances';
+    var sheet = 'Campaign Finances';
+
+    if (!_.isUndefined(data[title]) && !_.isUndefined(data[title][sheet])) {
+      data = data[title][sheet];
+    }
+    else {
+      return;
+    }
     data = _.groupBy(data, 'contest');
 
     // Make collections of candidates for each contest
