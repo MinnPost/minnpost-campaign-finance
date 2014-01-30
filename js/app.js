@@ -89,7 +89,7 @@ define('minnpost-campaign-finance', [
     // Because of Impaq.me and their use of respond.js, the Highcharts
     // don't work out.
     disableCharts: function() {
-      return (!_.isUndefined(window.impaq) && _.isObject(impaq) && helpers.isMSIE === 8);
+      return (!_.isUndefined(window.impaq) && _.isObject(impaq) && helpers.isMSIE() === 8);
     }
   };
 
