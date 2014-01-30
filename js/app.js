@@ -12,7 +12,7 @@ define('minnpost-campaign-finance', [
 
   // Constructor for app
   var App = function(options) {
-    this.options = options;
+    this.options = _.extend({}, this.defaultOptions, options);
     this.el = this.options.el;
     if (this.el) {
       this.$el = $(this.el);
@@ -82,6 +82,15 @@ define('minnpost-campaign-finance', [
       });
       this.contests.push(contest);
     }, this);
+  };
+
+  // Default options
+  App.prototype.defaultOptions = {
+    // Because of Impaq.me and their use of respond.js, the Highcharts
+    // don't work out.
+    disableCharts: function() {
+      return (!_.isUndefined(window.impaq) && _.isObject(impaq) && helpers.isMSIE === 8);
+    }
   };
 
   return App;
