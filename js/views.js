@@ -39,7 +39,7 @@ define('views', ['underscore', 'jquery', 'Ractive', 'Ractive-events-tap', 'Highc
         var contestPath = kSplit[0] + '.' + kSplit[1];
         var contest = this.get(contestPath);
         var currentInterval = _.find(contest.intervals, function(i, ii) {
-          return i.id === newID;
+          return i.id === newID.toString();
         });
 
         // Update current interval
