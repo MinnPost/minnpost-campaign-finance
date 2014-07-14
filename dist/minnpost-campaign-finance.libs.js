@@ -1,4 +1,3 @@
-
 /** vim: et:ts=4:sw=4:sts=4
  * @license RequireJS 2.1.11 Copyright (c) 2010-2014, The Dojo Foundation All Rights Reserved.
  * Available via the MIT or new BSD license.
@@ -4392,3 +4391,4 @@ define("Highcharts", ["jquery"], (function (global) {
         return ret || global.Highcharts;
     };
 }(this)));
+
